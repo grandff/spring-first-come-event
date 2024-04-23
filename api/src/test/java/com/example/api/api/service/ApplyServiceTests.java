@@ -22,7 +22,7 @@ public class ApplyServiceTests {
 
     @Test
     public void 한번만응모() {
-        applyService.apply(1L);
+        applyService.applyV1(1L);
         long count = couponRepository.count();
 
         assertThat(count).isEqualTo(1);
@@ -39,7 +39,8 @@ public class ApplyServiceTests {
             long userId = i;
             executorService.submit(() -> {
                 try{
-                    applyService.apply(userId);
+                    // applyService.applyV1(userId);
+                    applyService.applyV2(userId);
                 }finally {
                     latch.countDown();
                 }                
