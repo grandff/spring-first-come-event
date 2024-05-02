@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.api.api.domain.Coupon;
 import com.example.api.api.producer.CouponCreateProducer;
+import com.example.api.api.repository.AppliedUserRepository;
 import com.example.api.api.repository.CouponCountRepository;
 import com.example.api.api.repository.CouponRepository;
 
@@ -12,11 +13,13 @@ public class ApplyService {
     private final CouponRepository couponRepository;
     private final CouponCountRepository couponCountRepository;
     private final CouponCreateProducer couponCreateProducer;
+    private final AppliedUserRepository appliedUserRepository;
 
-    public ApplyService(CouponRepository couponRepository, CouponCountRepository couponCountRepository, CouponCreateProducer couponCreateProducer) {
+    public ApplyService(CouponRepository couponRepository, CouponCountRepository couponCountRepository, CouponCreateProducer couponCreateProducer, AppliedUserRepository appliedUserRepository) {
         this.couponRepository = couponRepository;
         this.couponCountRepository = couponCountRepository;
         this.couponCreateProducer = couponCreateProducer;
+        this.appliedUserRepository = appliedUserRepository;
     }
 
     public void applyV1(Long userId){
@@ -46,6 +49,10 @@ public class ApplyService {
     }
 
     public void applyV3(Long userId){
+        // 추가 갯수가 1이 아니라면 이미 발급받은 유저임
+        Long apply = appliedUserRepository.add(userId);
+        if(apply != 1) return;
+
         Long count = couponCountRepository.increment();
         if(count > 100) {
             return;
