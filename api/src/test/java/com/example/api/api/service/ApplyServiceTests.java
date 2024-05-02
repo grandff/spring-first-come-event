@@ -38,15 +38,16 @@ public class ApplyServiceTests {
         for (int i= 0; i<threadCount; i++) {
             long userId = i;
             executorService.submit(() -> {
-                try{
-                    // applyService.applyV1(userId);
-                    applyService.applyV2(userId);
+                try{                    
+                    applyService.applyV3(userId);
                 }finally {
                     latch.countDown();
                 }                
             });
         }
         latch.await();
+
+        Thread.sleep(10000);
 
         long count = couponRepository.count();
         assertThat(count).isEqualTo(100);

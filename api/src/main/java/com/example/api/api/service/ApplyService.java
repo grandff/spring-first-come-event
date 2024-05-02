@@ -3,6 +3,7 @@ package com.example.api.api.service;
 import org.springframework.stereotype.Service;
 
 import com.example.api.api.domain.Coupon;
+import com.example.api.api.producer.CouponCreateProducer;
 import com.example.api.api.repository.CouponCountRepository;
 import com.example.api.api.repository.CouponRepository;
 
@@ -10,10 +11,12 @@ import com.example.api.api.repository.CouponRepository;
 public class ApplyService {
     private final CouponRepository couponRepository;
     private final CouponCountRepository couponCountRepository;
+    private final CouponCreateProducer couponCreateProducer;
 
-    public ApplyService(CouponRepository couponRepository, CouponCountRepository couponCountRepository) {
+    public ApplyService(CouponRepository couponRepository, CouponCountRepository couponCountRepository, CouponCreateProducer couponCreateProducer) {
         this.couponRepository = couponRepository;
         this.couponCountRepository = couponCountRepository;
+        this.couponCreateProducer = couponCreateProducer;
     }
 
     public void applyV1(Long userId){
@@ -40,5 +43,15 @@ public class ApplyService {
 
         // 쿠폰 발급처리
         couponRepository.save(new Coupon(userId));
+    }
+
+    public void applyV3(Long userId){
+        Long count = couponCountRepository.increment();
+        if(count > 100) {
+            return;
+        }
+
+        // 프로듀서 사용
+        couponCreateProducer.create(userId);        
     }
 }
